@@ -1,6 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import * as z from "zod";
-import { queryCnd, type NewCnd } from "../schemas/cnd.js";
+import { type NewCnd, type QueryCnd } from "../schemas/cnd.js";
 import { Cnd } from "@prisma/client";
 
 class CndManager {
@@ -24,7 +23,7 @@ class CndManager {
     return createdCnd;
   }
 
-  static async getCnd(prop: z.infer<typeof queryCnd>): Promise<Cnd[]> {
+  static async getCnd(prop: QueryCnd): Promise<Cnd[]> {
     console.log(
       "[CndTypeManager.getCndTypes] Buscando tipos de CND com filtros:",
       prop,

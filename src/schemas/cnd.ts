@@ -51,7 +51,13 @@ const queryCnd = z
     path: ["page"],
   });
 
-const cndTipoEnum = z.enum(["federal", "estadual", "municipal", "trabalhista", "fgts"]);
+const cndTipoEnum = z.enum([
+  "federal",
+  "estadual",
+  "municipal",
+  "trabalhista",
+  "fgts",
+]);
 
 const newCnd = z
   .object({
@@ -64,17 +70,14 @@ const newCnd = z
   })
   .strict();
 
-const updateCnd = newCnd.partial();
-
 export type NewCnd = z.infer<typeof newCnd>;
-export type UpdateCnd = z.infer<typeof updateCnd>;
+export type QueryCnd = z.infer<typeof queryCnd>;
 
 export {
   queryCnd,
   whereCnd,
   orderByCnd,
   newCnd,
-  updateCnd,
   selectCnd,
   selectCndFields,
 };

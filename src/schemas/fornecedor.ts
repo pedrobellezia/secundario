@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { orderByCnd, whereCnd, selectCnd, selectCndFields } from "./cnd.js";
+import { orderByCnd, whereCnd, selectCndFields } from "./cnd.js";
 import { cnpj } from "cpf-cnpj-validator";
 
 const whereFornecedor = z
@@ -81,14 +81,13 @@ const newFornecedor = z
   })
   .strict();
 
-const updateFornecedor = newFornecedor.partial();
+export type QueryFornecedor = z.infer<typeof queryFornecedor>;
 
 export {
   queryFornecedor,
   whereFornecedor,
   orderByFornecedor,
   newFornecedor,
-  updateFornecedor,
   selectFornecedor,
   selectFornecedorFields,
 };

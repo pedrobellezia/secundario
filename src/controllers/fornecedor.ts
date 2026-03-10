@@ -1,6 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import * as z from "zod";
-import { queryFornecedor } from "../schemas/fornecedor.js";
+import { queryFornecedor, type QueryFornecedor } from "../schemas/fornecedor.js";
 import { Fornecedor } from "@prisma/client";
 import { ConflictError } from "../lib/error.js";
 
@@ -35,7 +34,7 @@ class FornecedorManager {
   }
 
   static async getFornecedores(
-    prop: z.infer<typeof queryFornecedor>,
+    prop: QueryFornecedor,
   ): Promise<Fornecedor[]> {
     console.log(
       "[FornecedorManager.getFornecedores] Buscando fornecedores com filtros:",
