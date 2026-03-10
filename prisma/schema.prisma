@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Fornecedor {
+  id        String   @id @default(uuid())
+  cnpj      String   @unique
+  name      String
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+
+  cnd Cnd[]
+}
+
+model Cnd {
+  id           String    @id @default(uuid())
+  fornecedorid String
+  file_name    String
+  validade     DateTime  @db.Date
+  emissao      DateTime? @db.Date
+  status       String
+  tipo         String
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+
+  // Relations
+  fornecedor Fornecedor @relation(fields: [fornecedorid], references: [id])
+}
