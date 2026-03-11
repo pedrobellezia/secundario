@@ -9,8 +9,8 @@ class CndManager {
       data: {
         fornecedorid: data.fornecedorid,
         file_name: data.file_name,
-        validade: new Date(`${data.validade}T12:00:00`),
-        emissao: data.emissao ? new Date(`${data.emissao}T12:00:00`) : undefined,
+        validade: new Date(`${data.validade}T12:00:00Z`),
+        emissao: data.emissao ? new Date(`${data.emissao}T12:00:00Z`) : undefined,
         status: data.status,
         tipo: data.tipo,
       },
