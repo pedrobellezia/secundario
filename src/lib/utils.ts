@@ -6,19 +6,21 @@ import crypto from "crypto";
 import path from "path";
 
 export type CndExtracted = {
-  cnpj: string | null;
-  nome: string | null;
-  emissao: string | null;
-  validade: string | null;
-  tipo: string | null;
-  status: string | null;
+  cnpj: string;
+  nome: string;
+  emissao: string;
+  validade: string;
+  tipo: string;
+  status: string;
 };
 
 export async function processBuffer(buffer: Buffer): Promise<CndExtracted> {
   const parser = new PDFParse(new Uint8Array(buffer));
   const { text } = await parser.getText();
 
-  if (!text?.trim()) throw new Error("PDF vazio ou ilegível");
+  if (!text?.trim()) {
+    throw new Error("PDF vazio ou ilegível");
+  }
 
   const response = await deepseek.post("/chat/completions", {
     model: promptConfig.model,
@@ -32,15 +34,19 @@ export async function processBuffer(buffer: Buffer): Promise<CndExtracted> {
 
   const parsed = JSON.parse(response.data.choices[0].message.content);
 
-  if (parsed.error) throw new Error(parsed.error);
+  if (!parsed.success) {
+    throw new Error(parsed.error);
+  }
+
+  const data = parsed.data;
 
   return {
-    cnpj: parsed.cnpj ?? null,
-    nome: parsed.nome ?? null,
-    emissao: parsed.emissao ?? null,
-    validade: parsed.validade ?? null,
-    tipo: parsed.tipo ?? null,
-    status: parsed.status ?? null,
+    cnpj: data.cnpj,
+    nome: data.nome,
+    emissao: data.emissao,
+    validade: data.validade,
+    tipo: data.tipo,
+    status: data.status,
   };
 }
 

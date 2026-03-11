@@ -4,13 +4,14 @@ import { Cnd } from "@prisma/client";
 
 class CndManager {
   static async newCnd(data: NewCnd): Promise<Cnd> {
-    
     const createdCnd = await prisma.cnd.create({
       data: {
         fornecedorid: data.fornecedorid,
         file_name: data.file_name,
         validade: new Date(`${data.validade}T12:00:00Z`),
-        emissao: data.emissao ? new Date(`${data.emissao}T12:00:00Z`) : undefined,
+        emissao: data.emissao
+          ? new Date(`${data.emissao}T12:00:00Z`)
+          : undefined,
         status: data.status,
         tipo: data.tipo,
       },
