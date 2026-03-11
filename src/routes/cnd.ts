@@ -61,7 +61,10 @@ cndRoute.post("/", upload.array("file"), async (req, res) => {
         });
 
         if (!cndData.success) {
-          console.error(`[CND] Falha de validação em "${file.originalname}":`, cndData.error.issues);
+          console.error(
+            `[CND] Falha de validação em "${file.originalname}":`,
+            cndData.error.issues,
+          );
           results.push({
             file: file.originalname,
             success: false,
@@ -87,15 +90,23 @@ cndRoute.post("/", upload.array("file"), async (req, res) => {
     const failed = results.filter((r) => !r.success);
 
     if (allFailed) {
-      ApiResponseHandler.error(res, "Nenhum arquivo foi processado com sucesso", results, 422);
+      ApiResponseHandler.error(
+        res,
+        "Nenhum arquivo foi processado com sucesso",
+        results,
+        422,
+      );
       return;
     }
 
     if (someFailed) {
-      console.warn(`[CND] ${failed.length} arquivo(s) falharam:`, failed.map((r) => r.file));
+      console.warn(
+        `[CND] ${failed.length} arquivo(s) falharam:`,
+        failed.map((r) => r.file),
+      );
     }
 
-    ApiResponseHandler.success(res, { results, failed: someFailed ? failed : undefined }, someFailed ? 207 : 201);
+    ApiResponseHandler.success(res, results, someFailed ? 207 : 201);
   } catch (error) {
     ApiResponseHandler.trycatchHandler(res, error as BaseError);
   }
