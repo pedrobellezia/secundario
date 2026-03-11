@@ -25,7 +25,7 @@ cndRoute.post("/", upload.array("file"), async (req, res) => {
       file: string;
       success: boolean;
       data?: any;
-      error?: string;
+      error?: any;
     }[] = [];
 
     for (const file of req.files) {
@@ -34,10 +34,12 @@ cndRoute.post("/", upload.array("file"), async (req, res) => {
         const extracted = await processBuffer(pdfBuffer);
 
         if (!extracted.cnpj) {
+          const reason = "CNPJ não encontrado no PDF";
+          console.error(`[CND] Falha em "${file.originalname}": ${reason}`);
           results.push({
             file: file.originalname,
             success: false,
-            error: "CNPJ não encontrado no PDF",
+            error: reason,
           });
           continue;
         }
@@ -59,10 +61,11 @@ cndRoute.post("/", upload.array("file"), async (req, res) => {
         });
 
         if (!cndData.success) {
+          console.error(`[CND] Falha de validação em "${file.originalname}":`, cndData.error.issues);
           results.push({
             file: file.originalname,
             success: false,
-            error: cndData.error.message,
+            error: cndData.error.issues,
           });
           continue;
         }
@@ -70,6 +73,7 @@ cndRoute.post("/", upload.array("file"), async (req, res) => {
         const cnd = await CndManager.newCnd(cndData.data);
         results.push({ file: file.originalname, success: true, data: cnd });
       } catch (err: any) {
+        console.error(`[CND] Erro inesperado em "${file.originalname}":`, err);
         results.push({
           file: file.originalname,
           success: false,
@@ -78,7 +82,20 @@ cndRoute.post("/", upload.array("file"), async (req, res) => {
       }
     }
 
-    ApiResponseHandler.success(res, results, 201);
+    const allFailed = results.every((r) => !r.success);
+    const someFailed = results.some((r) => !r.success);
+    const failed = results.filter((r) => !r.success);
+
+    if (allFailed) {
+      ApiResponseHandler.error(res, "Nenhum arquivo foi processado com sucesso", results, 422);
+      return;
+    }
+
+    if (someFailed) {
+      console.warn(`[CND] ${failed.length} arquivo(s) falharam:`, failed.map((r) => r.file));
+    }
+
+    ApiResponseHandler.success(res, { results, failed: someFailed ? failed : undefined }, someFailed ? 207 : 201);
   } catch (error) {
     ApiResponseHandler.trycatchHandler(res, error as BaseError);
   }
